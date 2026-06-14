@@ -1,0 +1,105 @@
+# Problems and Solutions
+
+## Problem #1: Database Spam
+
+### Observation
+
+Every detected object was being saved every frame.
+
+Example:
+
+Bottle
+Bottle
+Bottle
+Bottle
+Bottle
+
+### Root Cause
+
+The system stored detections instead of events.
+
+### Solution
+
+Switched to event-based memory.
+
+Stored:
+
+* Bottle appeared
+* Bottle disappeared
+
+instead of storing every frame.
+
+### Result
+
+Database size reduced dramatically and memory became meaningful.
+
+---
+
+## Problem #2: False Positive Detections
+
+### Observation
+
+YOLO occasionally detected objects that did not exist.
+
+Examples:
+
+* Bird
+* Banana
+* Knife
+
+### Root Cause
+
+Single-frame detections were trusted immediately.
+
+### Solution
+
+Introduced confidence threshold planning and multi-frame validation.
+
+### Result
+
+System became more resistant to noisy detections.
+
+---
+
+## Problem #3: Detection Flickering
+
+### Observation
+
+Objects repeatedly appeared and disappeared even when stationary.
+
+### Root Cause
+
+YOLO occasionally missed detections for individual frames.
+
+### Solution
+
+Designed a frame-confirmation system requiring multiple detections before confirming an object's presence.
+
+### Result
+
+Reduced event spam and increased stability.
+
+---
+
+## Problem #4: Object Identity
+
+### Observation
+
+YOLO can identify a bottle but cannot determine which bottle is being observed.
+
+### Example
+
+Blue bottle
+Green bottle
+
+Both are classified as:
+
+Bottle
+
+### Current Status
+
+Unsolved.
+
+### Future Direction
+
+Investigate object re-identification and visual fingerprinting.
