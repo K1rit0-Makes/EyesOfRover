@@ -3,9 +3,6 @@ __pycache__/
 *.pyc
 
 rover_memory.db
+scene_memory.json
 
 yolov8n.pt
-yolov8s.pt
-yolov8m.pt
-yolov8l.pt
-yolov8x.pt
