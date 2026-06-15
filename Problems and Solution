@@ -165,4 +165,17 @@ Future versions should compare scene similarity rather than requiring exact obje
 Discovered during Scene Memory Prototype testing.
 
 Solution not yet implemented.
+Problem #6
+
+A scene change is not the same thing as an object change.
+
+The room remained the same.
+
+Only the detected objects changed.
+
+Current memory system incorrectly creates new scenes when objects appear or disappear.
+
+Future solution:
+
+Use image similarity before deciding whether a new scene should be created.
 
