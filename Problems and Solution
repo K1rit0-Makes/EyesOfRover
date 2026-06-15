@@ -103,3 +103,66 @@ Unsolved.
 ### Future Direction
 
 Investigate object re-identification and visual fingerprinting.
+# Problem #5 - Scene Spam
+
+## Problem
+
+The first version of scene memory stored a new scene whenever the detected object list changed.
+
+Example:
+
+Scene 1:
+
+* Keyboard
+* Mouse
+
+Scene 2:
+
+* Keyboard
+
+Scene 3:
+
+* Keyboard
+* Mouse
+
+Although the rover never changed location, three separate scenes were created.
+
+## Root Cause
+
+YOLO detections are not perfectly stable.
+
+Sometimes an object is temporarily missed even though it is still present in the scene.
+
+The scene memory system treated these temporary detection losses as completely new environments.
+
+## Observation
+
+A scene is not simply a list of detected objects.
+
+Small detection changes do not necessarily mean the rover has moved.
+
+## Proposed Solution
+
+Introduce scene similarity scoring.
+
+Example:
+
+Scene A:
+
+* Keyboard
+* Mouse
+
+Scene B:
+
+* Keyboard
+
+Because most objects overlap, these scenes should be considered the same location.
+
+Future versions should compare scene similarity rather than requiring exact object matches.
+
+## Status
+
+Discovered during Scene Memory Prototype testing.
+
+Solution not yet implemented.
+
