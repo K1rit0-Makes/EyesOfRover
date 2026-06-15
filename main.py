@@ -125,7 +125,7 @@ while True:
                 missing_counter[obj] = 0
 
     # ----------------------
-    # SCENE MEMORY
+    # SCENE MEMORY + IMAGE
     # ----------------------
 
     if (
@@ -135,7 +135,8 @@ while True:
     ):
 
         saved = save_scene(
-            confirmed_objects
+            confirmed_objects,
+            frame
         )
 
         if saved:

@@ -1,9 +1,16 @@
 import json
 import os
+import cv2
 
 from datetime import datetime
 
 FILE_NAME = "scene_memory.json"
+SCENE_FOLDER = "scenes"
+
+os.makedirs(
+    SCENE_FOLDER,
+    exist_ok=True
+)
 
 
 def load_scenes():
@@ -20,7 +27,10 @@ def load_scenes():
         return json.load(file)
 
 
-def save_scene(objects):
+def save_scene(
+    objects,
+    frame
+):
 
     scenes = load_scenes()
 
@@ -28,9 +38,13 @@ def save_scene(objects):
         list(objects)
     )
 
-    # ----------------------
-    # COMPARE WITH PREVIOUS
-    # ----------------------
+    # Ignore empty scenes
+
+    if len(current_scene) == 0:
+
+        return False
+
+    # Compare with previous scene
 
     if scenes:
 
@@ -42,29 +56,40 @@ def save_scene(objects):
 
             return False
 
-    # ----------------------
-    # CREATE NEW SCENE
-    # ----------------------
+    scene_id = len(scenes) + 1
+
+    image_name = (
+        f"scene_{scene_id}.png"
+    )
+
+    image_path = os.path.join(
+        SCENE_FOLDER,
+        image_name
+    )
+
+    cv2.imwrite(
+        image_path,
+        frame
+    )
 
     new_scene = {
 
         "scene_id":
-        len(scenes) + 1,
+        scene_id,
 
         "timestamp":
         datetime.now().isoformat(),
 
         "objects":
-        current_scene
+        current_scene,
+
+        "image":
+        image_path
     }
 
     scenes.append(
         new_scene
     )
-
-    # ----------------------
-    # SAVE JSON
-    # ----------------------
 
     with open(
         FILE_NAME,
