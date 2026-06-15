@@ -18,3 +18,114 @@ Added
  Notes
 
 This version focuses on proving the vision and memory pipeline.
+
+## v0.2 - Scene Memory and Visual Memory System
+
+### Added
+
+* Scene-based memory architecture
+* JSON scene storage (`scene_memory.json`)
+* Scene change detection system
+* Visual scene memory using saved camera images
+* Automatic scene image linking inside memory records
+* Scene timestamps for temporal tracking
+* Runtime memory separation using `.gitignore`
+* GitHub project documentation updates
+
+### Improved
+
+* Memory system evolved from event-only storage to scene-level storage
+* Added support for storing object context instead of only appearance/disappearance events
+* Scene records now store both detected objects and corresponding visual snapshots
+* Repository structure cleaned and organized for future development
+
+### Problems Identified
+
+#### Problem #4 - Object Flickering Creates False Scene Changes
+
+YOLO occasionally detects objects inconsistently between frames, causing the memory system to think a scene has changed when the environment has not.
+
+**Example:**
+
+Scene A:
+
+* keyboard
+* mouse
+
+Next memory snapshot:
+
+* keyboard
+
+The mouse was not removed from the real world; YOLO simply failed to detect it.
+
+---
+
+#### Problem #5 - Visual Context Was Missing
+
+The memory system stored only object names.
+
+**Example:**
+
+```json
+{
+    "objects": [
+        "keyboard",
+        "mouse"
+    ]
+}
+```
+
+This provided no visual evidence of what the rover actually saw.
+
+**Solution:**
+
+Store an image alongside each saved scene.
+
+---
+
+#### Problem #6 - Object Change Is Not Scene Change
+
+The rover currently assumes that changes in detected objects automatically mean a new scene.
+
+**Example:**
+
+Scene 1:
+
+* person
+* bottle
+
+Scene 2:
+
+* person
+
+Current system:
+
+```text
+New Scene
+```
+
+Actual reality:
+
+```text
+Same Scene
+Bottle Removed
+```
+
+Future solution:
+
+* Image similarity comparison
+* Scene matching
+* Change tracking within existing scenes
+
+### Engineering Lessons Learned
+
+* Runtime-generated data should never be committed to GitHub.
+* Visual memory is required before scene comparison can exist.
+* Scene understanding requires more than object detection.
+* A robot must remember environments, not just labels.
+* Proper Git workflows (commit, rebase, push) are essential for project maintenance.
+
+### Notes
+
+This version marks the transition from simple object detection to the first stage of environmental memory. EyesOfRover can now remember both what it detected and what it visually observed, laying the foundation for future scene recognition, place recognition, and SLAM-inspired navigation systems.
+
