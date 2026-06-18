@@ -7,3 +7,4 @@ scene_memory.json
 scenes/
 
 *.pt
+test.py
