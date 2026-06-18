@@ -178,4 +178,95 @@ Current memory system incorrectly creates new scenes when objects appear or disa
 Future solution:
 
 Use image similarity before deciding whether a new scene should be created.
+---
+
+## Problem #7: Scene Matching Fails When Camera Is Moving
+
+### Observation
+
+The rover sometimes saved new scenes even though it was looking at the same location.
+
+Example:
+
+Scene A:
+
+* Keyboard
+* Phone
+
+Scene B:
+
+* Keyboard
+* Phone
+
+However, Scene B was captured while the camera was moving, causing motion blur.
+
+The system incorrectly treated the blurred image as a new environment.
+
+### Root Cause
+
+Image similarity comparison assumes both images are reasonably clear.
+
+Motion blur changes pixel information significantly even when the environment remains unchanged.
+
+### Solution
+
+Future rover versions should only capture scene memories when the rover is stationary.
+
+Possible improvements:
+
+* Motion detection
+* Blur detection
+* Stability checks before saving
+
+### Result
+
+Identified an important limitation of image-based scene recognition.
+
+---
+
+## Problem #8: Object Confidence Thresholds Affect Memory Quality
+
+### Observation
+
+Important objects were visible to a human observer but were not always added to memory.
+
+Example:
+
+Bottle detected at:
+
+0.39 confidence
+
+Current threshold:
+
+0.55 confidence
+
+Result:
+
+Bottle was ignored despite being clearly visible.
+
+### Root Cause
+
+A single confidence threshold is too strict for all object classes.
+
+Small objects, partially occluded objects, and poorly lit objects often receive lower confidence scores.
+
+### Proposed Solution
+
+Use temporal validation instead of relying solely on confidence.
+
+Example:
+
+Accept an object if:
+
+* It appears in most frames over a time window
+* Average confidence remains above a minimum threshold
+
+This allows stable low-confidence detections to be remembered.
+
+### Status
+
+Partially solved through multi-frame observation.
+
+Future versions may use confidence averaging and object persistence scoring.
+
 
