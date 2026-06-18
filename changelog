@@ -129,3 +129,131 @@ Future solution:
 
 This version marks the transition from simple object detection to the first stage of environmental memory. EyesOfRover can now remember both what it detected and what it visually observed, laying the foundation for future scene recognition, place recognition, and SLAM-inspired navigation systems.
 
+## v0.3 - Scene Recognition and Known Scene Matching
+
+### Added
+
+* Scene comparison engine (`scene_compare.py`)
+* Image similarity-based scene matching
+* Known scene recognition system
+* Automatic duplicate scene prevention
+* Scene ID tracking and retrieval
+* YOLOv8m integration for improved detection accuracy
+* Improved Git repository structure and asset management
+
+### Improved
+
+* Reduced duplicate scene saves caused by minor object fluctuations
+* Scene recognition now considers visual similarity instead of only detected objects
+* Added support for recognizing previously observed environments
+* Improved detection reliability for small and partially occluded objects
+* Runtime-generated files are now excluded from Git tracking
+
+### Problems Identified
+
+#### Problem #7 - Object Detection Alone Cannot Represent a Scene
+
+The system initially attempted to identify scenes solely using detected object lists.
+
+Example:
+
+Scene A:
+
+* keyboard
+* mouse
+* phone
+
+Scene B:
+
+* keyboard
+* mouse
+* phone
+
+Although the object lists are identical, the actual environments may be completely different.
+
+Result:
+
+```text
+False Scene Match
+```
+
+Lesson:
+
+A scene must be compared visually, not only semantically.
+
+---
+
+#### Problem #8 - Camera Motion Creates False Scenes
+
+When the webcam moves rapidly, captured frames become blurred.
+
+Example:
+
+* Same desk
+* Same objects
+* Motion blur introduced
+
+Current system:
+
+```text
+New Scene Detected
+```
+
+Actual reality:
+
+```text
+Same Scene
+Poor Frame Quality
+```
+
+Future solution:
+
+* Rover captures scenes only when stationary
+* Blur detection before saving
+* Quality scoring for scene images
+
+---
+
+#### Problem #9 - Object Confidence Thresholds Affect Memory Quality
+
+Objects such as bottles, cups, and small desk items often appear with lower confidence scores.
+
+Example:
+
+```text
+Bottle: 0.39 confidence
+```
+
+Current challenge:
+
+Strict confidence thresholds prevent useful objects from entering memory.
+
+Future solution:
+
+* Temporal confidence averaging
+* Multi-frame voting
+* Object persistence tracking
+
+### Engineering Lessons Learned
+
+* Object detection and scene recognition are separate problems.
+* Visual memory must exist before intelligent search can exist.
+* Scene similarity is more reliable than object lists alone.
+* Runtime data should remain local and not be committed to Git.
+* Model weights should never be stored inside the repository.
+* AI search requires structured memory before reasoning can occur.
+
+### Notes
+
+This version marks the transition from scene storage to scene recognition.
+
+EyesOfRover can now compare newly observed environments against previously stored visual memories and determine whether the rover has encountered a scene before.
+
+This milestone establishes the foundation for the next phase:
+
+* LangChain integration
+* Tool-calling AI agents
+* Natural language scene search
+* Visual memory retrieval
+* Context-aware rover reasoning
+
