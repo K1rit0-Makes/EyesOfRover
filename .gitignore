@@ -5,6 +5,5 @@ __pycache__/
 rover_memory.db
 scene_memory.json
 scenes/
-scene_memory.json
 
-yolov8n.pt
+*.pt
