@@ -4,8 +4,12 @@ import cv2
 
 from datetime import datetime
 
+from scene_compare import compare_images
+
 FILE_NAME = "scene_memory.json"
 SCENE_FOLDER = "scenes"
+
+IMAGE_SIMILARITY_THRESHOLD = 85
 
 os.makedirs(
     SCENE_FOLDER,
@@ -38,23 +42,65 @@ def save_scene(
         list(objects)
     )
 
-    # Ignore empty scenes
-
     if len(current_scene) == 0:
+
+        print(
+            "Empty Scene - Skipping"
+        )
 
         return False
 
-    # Compare with previous scene
+    # ----------------------
+    # SEARCH ENTIRE MEMORY
+    # ----------------------
 
-    if scenes:
+    best_similarity = 0
+    best_scene_id = None
 
-        previous_scene = sorted(
-            scenes[-1]["objects"]
+    for scene in scenes:
+
+        similarity = compare_images(
+            scene["image"],
+            frame
         )
 
-        if previous_scene == current_scene:
+        if similarity > best_similarity:
 
-            return False
+            best_similarity = similarity
+
+            best_scene_id = scene["scene_id"]
+
+    # ----------------------
+    # FOUND KNOWN SCENE
+    # ----------------------
+
+    if best_similarity >= IMAGE_SIMILARITY_THRESHOLD:
+
+        print(
+            f"\nKnown Scene Found"
+        )
+
+        print(
+            f"Scene ID: {best_scene_id}"
+        )
+
+        print(
+            f"Similarity: {best_similarity}%"
+        )
+
+        print(
+            "Skipping Save\n"
+        )
+
+        return False
+
+    # ----------------------
+    # NEW SCENE
+    # ----------------------
+
+    print(
+        "\nNew Scene Detected"
+    )
 
     scene_id = len(scenes) + 1
 
@@ -101,5 +147,9 @@ def save_scene(
             file,
             indent=4
         )
+
+    print(
+        f"Scene {scene_id} Saved\n"
+    )
 
     return True

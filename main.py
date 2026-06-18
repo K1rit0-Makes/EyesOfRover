@@ -9,10 +9,10 @@ from scene_memory import save_scene
 # SETTINGS
 # ==========================
 
-MIN_CONFIDENCE = 0.80
+MIN_CONFIDENCE = 0.35
 
-APPEAR_THRESHOLD = 30
-DISAPPEAR_THRESHOLD = 30
+APPEAR_THRESHOLD = 20
+DISAPPEAR_THRESHOLD = 20
 
 SCENE_SAVE_INTERVAL = 5
 
@@ -20,7 +20,7 @@ SCENE_SAVE_INTERVAL = 5
 # YOLO
 # ==========================
 
-model = YOLO("yolov8n.pt")
+model = YOLO("yolov8m.pt")
 
 cap = cv2.VideoCapture(0)
 
