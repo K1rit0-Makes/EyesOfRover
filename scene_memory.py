@@ -6,7 +6,7 @@ from datetime import datetime
 
 from scene_compare import compare_images
 
-FILE_NAME = "scene_memory.json"
+FILE_NAME = "data/scene_memory.json"
 SCENE_FOLDER = "scenes"
 
 IMAGE_SIMILARITY_THRESHOLD = 85

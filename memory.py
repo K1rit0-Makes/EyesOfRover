@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_NAME = "rover_memory.db"
+DB_NAME = "data/rover_memory.db"
 
 
 def initialize_database():

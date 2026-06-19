@@ -20,7 +20,7 @@ SCENE_SAVE_INTERVAL = 5
 # YOLO
 # ==========================
 
-model = YOLO("yolov8m.pt")
+model = YOLO("yolomodels/yolov8m.pt")
 
 cap = cv2.VideoCapture(0)
 

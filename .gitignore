@@ -1,10 +1,22 @@
+# Python
 .venv/
 __pycache__/
 *.pyc
 
-rover_memory.db
-scene_memory.json
+# Runtime Data
+data/
 scenes/
 
+# AI Models
+yolomodels/
 *.pt
+
+# Temporary Files
 test.py
+
+# VS Code
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
