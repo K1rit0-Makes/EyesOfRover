@@ -269,4 +269,220 @@ Partially solved through multi-frame observation.
 
 Future versions may use confidence averaging and object persistence scoring.
 
+---
+
+## Problem #9: Memory Retrieval Required Hardcoded Logic
+
+### Observation
+
+Early memory retrieval relied on predefined workflows.
+
+Example:
+
+User:
+
+```text
+Where is the keyboard?
+```
+
+Required a dedicated search pipeline that explicitly extracted the object name and performed a fixed lookup.
+
+The rover could retrieve memory, but it could not reason about user intent.
+
+### Root Cause
+
+Memory retrieval logic was tightly coupled to individual query types.
+
+Each new capability required new hardcoded logic.
+
+Current architecture did not scale well as the number of memory tools increased.
+
+### Solution
+
+Introduce a planner-based architecture.
+
+New workflow:
+
+```text
+User Query
+↓
+Planner
+↓
+Select Appropriate Tool
+↓
+Retrieve Memory
+↓
+Generate Answer
+```
+
+The planner interprets the user's request and determines which memory operation should be executed.
+
+### Result
+
+Memory retrieval became modular and extensible.
+
+New capabilities can now be added through tools rather than creating entirely new query pipelines.
+
+### Status
+
+Solved in v0.4.
+
+---
+
+## Problem #10: Rover Had No Conversation Memory
+
+### Observation
+
+The rover could answer questions but could not remember previous interactions.
+
+Example:
+
+User:
+
+```text
+Where is the keyboard?
+```
+
+Followed by:
+
+```text
+How many times was it observed?
+```
+
+The rover treated each question as an isolated request.
+
+### Root Cause
+
+No short-term memory existed between interactions.
+
+Previous questions and answers were discarded after response generation.
+
+### Solution
+
+Introduce conversation memory.
+
+Store recent:
+
+* User queries
+* Rover responses
+
+Maintain a rolling memory window of recent interactions.
+
+### Result
+
+The rover now possesses short-term conversational memory and can provide context to future reasoning systems.
+
+### Status
+
+Partially solved in v0.4.
+
+Conversation memory exists but is not yet heavily utilized by the planner.
+
+---
+
+## Problem #11: Single Tool Execution Limits Reasoning
+
+### Observation
+
+The rover can access multiple memory tools but can only execute one tool per query.
+
+Example:
+
+User:
+
+```text
+What objects do you know and how many times was the keyboard observed?
+```
+
+Current behavior:
+
+```text
+Select one tool
+Return one result
+```
+
+Desired behavior:
+
+```text
+Select multiple tools
+Combine results
+Generate unified answer
+```
+
+### Root Cause
+
+Current state architecture stores:
+
+```python
+action
+tool_result
+```
+
+which assumes a single action and a single result.
+
+The planner can only route to one operation.
+
+### Proposed Solution
+
+Redesign state architecture.
+
+Current:
+
+```python
+action
+tool_result
+```
+
+Future:
+
+```python
+actions
+tool_results
+```
+
+Planner output:
+
+```json
+{
+    "actions": [
+        {
+            "tool": "LIST_ALL_OBJECTS"
+        },
+        {
+            "tool": "COUNT_OBJECT_OCCURRENCES",
+            "object_name": "keyboard"
+        }
+    ]
+}
+```
+
+Execution engine:
+
+```text
+Planner
+↓
+Execute Tool 1
+↓
+Execute Tool 2
+↓
+Aggregate Results
+↓
+Answer
+```
+
+### Expected Benefits
+
+* Multi-tool reasoning
+* Better memory utilization
+* Richer answers
+* More natural conversations
+* Foundation for autonomous planning
+
+### Status
+
+Discovered during v0.4 development.
+
+Planned for v0.5.
+
+
 
