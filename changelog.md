@@ -256,4 +256,172 @@ This milestone establishes the foundation for the next phase:
 * Natural language scene search
 * Visual memory retrieval
 * Context-aware rover reasoning
+  -----------------------------
+  ## v0.4 - Planner-Based Memory Agent and Natural Language Reasoning
+
+### Added
+
+* LangGraph-based agent architecture
+* Planner node for natural language query interpretation
+* Local LLM integration (`llm.py`)
+* Conversation memory system (`conversation_memory.py`)
+* Natural language memory querying
+* Tool-driven memory retrieval pipeline
+* Object occurrence counting tool
+* Nearby object analysis tool
+* Latest scene retrieval tool
+* First observation retrieval tool
+* Last observation retrieval tool
+* Object timeline retrieval tool
+* Scene comparison tool
+* Expanded memory search capabilities
+* Git version tagging (`v0.4`)
+
+### Improved
+
+* Transitioned from hardcoded object extraction to planner-driven reasoning
+* Separated reasoning, memory retrieval, and response generation into independent modules
+* Expanded memory capabilities beyond simple scene lookup
+* Improved project structure and maintainability
+* Added support for conversational interactions with rover memory
+* Introduced short-term conversation memory for contextual responses
+
+### Problems Identified
+
+#### Problem #10 - Memory Retrieval Was Not Intelligent
+
+Previous versions relied on predefined logic to retrieve information.
+
+Example:
+
+```text
+Where is keyboard?
+```
+
+Required a dedicated search pipeline.
+
+The rover could not reason about the user's intent before selecting a memory operation.
+
+Current solution:
+
+* Planner node
+* Tool routing architecture
+* LLM-driven query interpretation
+
+---
+
+#### Problem #11 - No Conversational Memory
+
+The rover could answer questions but could not remember previous interactions.
+
+Example:
+
+User:
+
+```text
+Where is the keyboard?
+```
+
+Followed by:
+
+```text
+How many times was it observed?
+```
+
+The rover lacked conversation awareness.
+
+Current solution:
+
+* Short-term conversation memory
+* Automatic storage of recent questions and answers
+* Context injection during answer generation
+
+---
+
+#### Problem #12 - Memory Tools Were Isolated
+
+Memory operations existed independently but were not exposed through a unified reasoning layer.
+
+Example:
+
+```text
+Scene Search
+Object Count
+Nearby Object Analysis
+```
+
+All existed separately.
+
+The rover lacked a centralized decision-making system capable of selecting the correct operation.
+
+Current solution:
+
+* Planner architecture
+* Unified tool interface
+* Agent-driven memory retrieval
+
+---
+
+#### Problem #13 - Single Tool Execution Limits Reasoning
+
+Current planner architecture selects only one tool per query.
+
+Example:
+
+User:
+
+```text
+What objects do you know and how many times was the keyboard observed?
+```
+
+Current behavior:
+
+```text
+Select one tool
+Return one result
+```
+
+Desired behavior:
+
+```text
+Select multiple tools
+Aggregate results
+Generate combined answer
+```
+
+Future solution:
+
+* Multi-tool execution engine
+* Action list architecture
+* Tool result aggregation
+* Multi-step reasoning chains
+
+### Engineering Lessons Learned
+
+* Memory retrieval and reasoning are separate system components.
+* Tools provide capabilities; agents decide when to use them.
+* Storing memory is easier than reasoning over memory.
+* Planner-based architectures scale better than hardcoded pipelines.
+* Conversation memory significantly improves user interaction quality.
+* Agent systems should be designed around extensibility rather than fixed workflows.
+* Single-tool agents eventually become a bottleneck for complex reasoning tasks.
+
+### Notes
+
+This version marks the transition from memory retrieval to agent-based reasoning.
+
+EyesOfRover can now interpret natural language questions, determine the appropriate memory operation, retrieve information from memory systems, and generate contextual responses using a local language model.
+
+The rover has evolved from a visual memory system into an interactive memory agent.
+
+This milestone establishes the foundation for the next phase:
+
+* Multi-tool execution
+* Tool aggregation pipelines
+* Context-aware planning
+* Memory-aware reasoning
+* Navigation memory
+* Position tracking
+* Rover autonomy
+
 
