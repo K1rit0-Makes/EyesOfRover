@@ -1,262 +1,205 @@
-from agent.llm import get_llm
-
-from agent.tools import (
-    search_object,
-    count_object_occurrences,
-    get_scene,
-    find_nearby_objects,
-    get_latest_scene
-)
+import json
 
 from agent.conversation_memory import (
+    get_recent_conversations,
     save_conversation,
-    get_recent_conversations
 )
-
+from agent.llm import get_llm
+from agent.tools import (
+    compare_scenes,
+    count_object_occurrences,
+    find_nearby_objects,
+    first_observation,
+    get_latest_scene,
+    get_scene,
+    last_observation,
+    list_all_objects,
+    object_timeline,
+    search_object,
+)
 
 llm = get_llm()
 
 
-def planner_node(
-    state
-):
+TOOLS = {
+    "SEARCH_OBJECT": search_object,
+    "COUNT_OBJECT_OCCURRENCES": count_object_occurrences,
+    "GET_SCENE": get_scene,
+    "FIND_NEARBY_OBJECTS": find_nearby_objects,
+    "GET_LATEST_SCENE": get_latest_scene,
+    "LIST_ALL_OBJECTS": list_all_objects,
+    "FIRST_OBSERVATION": first_observation,
+    "LAST_OBSERVATION": last_observation,
+    "OBJECT_TIMELINE": object_timeline,
+    "COMPARE_SCENES": compare_scenes,
+}
 
-    print(
-        "\n========== PLANNER ==========\n"
-    )
+
+def planner_node(state):
+    print("\n========== PLANNER ==========\n")
 
     response = llm.invoke(
         f"""
-You are a planner.
+You are the planning module of Eyes Of Rover.
 
-Available Actions:
+Your ONLY job is to decide which tools should be executed.
+
+You may call ONE OR MORE tools.
+
+Available Tools
 
 SEARCH_OBJECT
 COUNT_OBJECT_OCCURRENCES
 GET_SCENE
 FIND_NEARBY_OBJECTS
 GET_LATEST_SCENE
+LIST_ALL_OBJECTS
+FIRST_OBSERVATION
+LAST_OBSERVATION
+OBJECT_TIMELINE
+COMPARE_SCENES
 
-User Query:
+User Query
 
 {state["user_query"]}
 
 Return ONLY valid JSON.
 
-Examples:
+Example 1
 
 {{
-    "action":"SEARCH_OBJECT",
-    "object_name":"keyboard",
-    "scene_id":null
+    "actions":[
+        {{
+            "tool":"SEARCH_OBJECT",
+            "object_name":"keyboard"
+        }}
+    ]
 }}
 
-{{
-    "action":"COUNT_OBJECT_OCCURRENCES",
-    "object_name":"cup",
-    "scene_id":null
-}}
+Example 2
 
 {{
-    "action":"GET_SCENE",
-    "object_name":null,
-    "scene_id":8
+    "actions":[
+        {{
+            "tool":"SEARCH_OBJECT",
+            "object_name":"keyboard"
+        }},
+        {{
+            "tool":"COUNT_OBJECT_OCCURRENCES",
+            "object_name":"keyboard"
+        }}
+    ]
 }}
 
-{{
-    "action":"FIND_NEARBY_OBJECTS",
-    "object_name":"keyboard",
-    "scene_id":null
-}}
+Example 3
 
 {{
-    "action":"GET_LATEST_SCENE",
-    "object_name":null,
-    "scene_id":null
+    "actions":[
+        {{
+            "tool":"GET_SCENE",
+            "scene_id":5
+        }},
+        {{
+            "tool":"COMPARE_SCENES",
+            "scene_a":5,
+            "scene_b":8
+        }}
+    ]
 }}
 """
     )
 
-    import json
+    data = json.loads(response.content)
 
-    data = json.loads(
-        response.content
-    )
+    state["actions"] = data["actions"]
 
-    state["action"] = data["action"]
+    print("Planned Actions\n")
 
-    state["object_name"] = data.get(
-        "object_name"
-    )
-
-    state["scene_id"] = data.get(
-        "scene_id"
-    )
-
-    print(
-        "Action:",
-        state["action"]
-    )
-
-    print(
-        "Object:",
-        state["object_name"]
-    )
-
-    print(
-        "Scene:",
-        state["scene_id"]
-    )
+    for action in state["actions"]:
+        print(action)
 
     return state
 
 
-def search_object_node(
-    state
-):
+def execute_tools_node(state):
+    print("\n========== EXECUTOR ==========\n")
 
-    print(
-        "\n========== SEARCH OBJECT ==========\n"
-    )
+    results = []
 
-    state["tool_result"] = (
-        search_object.invoke(
-            {
-                "object_name":
-                state["object_name"]
-            }
-        )
-    )
+    for action in state["actions"]:
+        tool_name = action["tool"]
 
-    return state
+        print("Executing:", tool_name)
 
+        if tool_name not in TOOLS:
+            results.append(
+                {"tool": tool_name, "result": {"error": "Unknown Tool"}}
+            )
+            continue
 
-def count_object_node(
-    state
-):
+        tool = TOOLS[tool_name]
 
-    print(
-        "\n========== COUNT OBJECT ==========\n"
-    )
+        arguments = {}
 
-    state["tool_result"] = (
-        count_object_occurrences.invoke(
-            {
-                "object_name":
-                state["object_name"]
-            }
-        )
-    )
+        if "object_name" in action:
+            arguments["object_name"] = action["object_name"]
 
-    return state
+        if "scene_id" in action:
+            arguments["scene_id"] = action["scene_id"]
 
+        if "scene_a" in action:
+            arguments["scene_a"] = action["scene_a"]
 
-def get_scene_node(
-    state
-):
+        if "scene_b" in action:
+            arguments["scene_b"] = action["scene_b"]
 
-    print(
-        "\n========== GET SCENE ==========\n"
-    )
+        result = tool.invoke(arguments)
 
-    state["tool_result"] = (
-        get_scene.invoke(
-            {
-                "scene_id":
-                state["scene_id"]
-            }
-        )
-    )
+        results.append({"tool": tool_name, "result": result})
+
+    state["tool_results"] = results
+
+    print("\nExecuted Tools\n")
+
+    for result in results:
+        print(result["tool"])
 
     return state
 
 
-def nearby_objects_node(
-    state
-):
-
-    print(
-        "\n========== NEARBY OBJECTS ==========\n"
-    )
-
-    state["tool_result"] = (
-        find_nearby_objects.invoke(
-            {
-                "object_name":
-                state["object_name"]
-            }
-        )
-    )
-
-    return state
-
-
-def latest_scene_node(
-    state
-):
-
-    print(
-        "\n========== LATEST SCENE ==========\n"
-    )
-
-    state["tool_result"] = (
-        get_latest_scene.invoke({})
-    )
-
-    return state
-
-
-def answer_node(
-    state
-):
-
-    print(
-        "\n========== ANSWER ==========\n"
-    )
+def answer_node(state):
+    print("\n========== ANSWER ==========\n")
 
     response = llm.invoke(
         f"""
 You are Eyes Of Rover.
 
-User Query:
+User Query
 
 {state["user_query"]}
 
-Action:
+Tool Results
 
-{state["action"]}
+{state["tool_results"]}
 
-Tool Result:
-
-{state["tool_result"]}
-
-Recent Conversation Memory:
+Recent Conversation Memory
 
 {get_recent_conversations()}
 
-Answer the user's question.
+Answer ONLY using the tool results.
 
-Only use the provided tool result.
+Never invent information.
 
-Do not invent information.
+If multiple tool results are available,
+combine them into a single natural answer.
 """
     )
+    state["final_answer"] = response.content.strip()
 
-    state["final_answer"] = (
-        response.content.strip()
-    )
+    save_conversation(state["user_query"], state["final_answer"])
 
-    save_conversation(
-        state["user_query"],
-        state["final_answer"]
-    )
+    print(state["final_answer"])
 
-    print(
-        state["final_answer"]
-    )
-
-    print(
-        "\n========== END ANSWER ==========\n"
-    )
+    print("\n========== END ANSWER ==========\n")
 
     return state

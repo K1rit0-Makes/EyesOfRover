@@ -1,15 +1,15 @@
-from langgraph.graph import StateGraph
-from langgraph.graph import END
+from langgraph.graph import (
+    StateGraph,
+    END
+)
 
-from agent.state import RoverState
+from agent.state import (
+    RoverState
+)
 
 from agent.nodes import (
     planner_node,
-    search_object_node,
-    count_object_node,
-    get_scene_node,
-    nearby_objects_node,
-    latest_scene_node,
+    execute_tools_node,
     answer_node
 )
 
@@ -25,28 +25,8 @@ builder.add_node(
 )
 
 builder.add_node(
-    "search_object",
-    search_object_node
-)
-
-builder.add_node(
-    "count_object",
-    count_object_node
-)
-
-builder.add_node(
-    "get_scene",
-    get_scene_node
-)
-
-builder.add_node(
-    "nearby_objects",
-    nearby_objects_node
-)
-
-builder.add_node(
-    "latest_scene",
-    latest_scene_node
+    "execute_tools",
+    execute_tools_node
 )
 
 builder.add_node(
@@ -55,68 +35,24 @@ builder.add_node(
 )
 
 
-def route_action(
-    state
-):
-
-    return state["action"]
+builder.set_entry_point(
+    "planner"
+)
 
 
-builder.add_conditional_edges(
+builder.add_edge(
     "planner",
-    route_action,
-    {
-        "SEARCH_OBJECT":
-        "search_object",
-
-        "COUNT_OBJECT_OCCURRENCES":
-        "count_object",
-
-        "GET_SCENE":
-        "get_scene",
-
-        "FIND_NEARBY_OBJECTS":
-        "nearby_objects",
-
-        "GET_LATEST_SCENE":
-        "latest_scene"
-    }
-)
-
-
-builder.add_edge(
-    "search_object",
-    "answer"
+    "execute_tools"
 )
 
 builder.add_edge(
-    "count_object",
-    "answer"
-)
-
-builder.add_edge(
-    "get_scene",
-    "answer"
-)
-
-builder.add_edge(
-    "nearby_objects",
-    "answer"
-)
-
-builder.add_edge(
-    "latest_scene",
+    "execute_tools",
     "answer"
 )
 
 builder.add_edge(
     "answer",
     END
-)
-
-
-builder.set_entry_point(
-    "planner"
 )
 
 

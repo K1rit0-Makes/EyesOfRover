@@ -8,23 +8,13 @@ query = input(
 
 result = graph.invoke(
     {
-        "user_query":
-        query,
+        "user_query": query,
 
-        "action":
-        "",
+        "actions": [],
 
-        "object_name":
-        None,
+        "tool_results": [],
 
-        "scene_id":
-        None,
-
-        "tool_result":
-        None,
-
-        "final_answer":
-        ""
+        "final_answer": ""
     }
 )
 
