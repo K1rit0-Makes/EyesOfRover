@@ -484,5 +484,81 @@ Discovered during v0.4 development.
 
 Planned for v0.5.
 
+---
+
+## Problem #12: Single-Tool Architecture Limited Future Growth
+
+### Observation
+
+The rover's planner could only execute one tool per user query.
+
+Example:
+
+User:
+
+```text
+Where was the keyboard last seen and how many times has it been observed?
+```
+
+The planner had to choose only one tool, making it impossible to answer more complex questions.
+
+### Root Cause
+
+The architecture stored only one action and one tool result.
+
+```python
+action
+tool_result
+```
+
+The LangGraph workflow routed execution to a single tool node, making the graph larger every time a new tool was added.
+
+### Solution
+
+The architecture was redesigned into a Planner–Executor workflow.
+
+The planner now returns a list of actions:
+
+```json
+{
+    "actions": [
+        {
+            "tool": "LAST_OBSERVATION",
+            "object_name": "keyboard"
+        },
+        {
+            "tool": "COUNT_OBJECT_OCCURRENCES",
+            "object_name": "keyboard"
+        }
+    ]
+}
+```
+
+The executor dynamically executes every planned tool before sending all results to the answer generator.
+
+The state was redesigned from:
+
+```python
+action
+tool_result
+```
+
+to:
+
+```python
+actions
+tool_results
+```
+
+### Result
+
+The rover can now execute multiple tools during a single request.
+
+The graph became significantly simpler and adding new tools no longer requires modifying the graph architecture.
+
+### Status
+
+Solved in v0.5.
+
 
 
