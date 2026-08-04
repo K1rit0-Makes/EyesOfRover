@@ -424,4 +424,40 @@ This milestone establishes the foundation for the next phase:
 * Position tracking
 * Rover autonomy
 
+## v0.5 - Planner–Executor Architecture
 
+### Added
+
+* Planner capable of returning multiple tool actions
+* Generic executor node for dynamic tool execution
+* Centralized tool registry
+* Multi-tool execution pipeline
+* Redesigned agent state using `actions` and `tool_results`
+* Git version tag (`v0.5`)
+
+### Improved
+
+* Replaced the previous one-tool routing architecture
+* Simplified the LangGraph workflow from many execution nodes to a single executor
+* Reduced graph complexity and improved maintainability
+* New memory tools can now be added without modifying the graph
+
+### Engineering Lessons Learned
+
+* Planning and execution should remain independent components.
+* Generic executors scale better than one-node-per-tool architectures.
+* State should represent collections of actions rather than single operations.
+* Simpler architectures are easier to extend and maintain.
+
+### Notes
+
+This release represents the architectural redesign of the EyesOfRover reasoning engine.
+
+The previous graph required a dedicated node for every memory tool. Version 0.5 introduces a Planner–Executor architecture where the planner generates a list of tool calls and a generic executor performs them before the final answer is generated.
+
+This architecture forms the foundation for future capabilities such as:
+
+* Multi-tool reasoning
+* Parallel tool execution
+* Planner → Executor → Planner reasoning loops
+* More autonomous memory retrieval
