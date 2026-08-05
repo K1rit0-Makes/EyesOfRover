@@ -19,6 +19,29 @@ Bottle
 The system stored detections instead of events.
 
 ### Solution
+=================================
+Observation — LLM chooses semantic retrieval over dedicated comparison tools
+
+Observation
+
+When asked to compare two scenes, the planner sometimes selected:
+
+GET_SCENE
+GET_LATEST_SCENE
+
+instead of the dedicated COMPARE_SCENES tool.
+
+Reason
+
+The planner recognized that retrieving both scenes provides enough information for the answer model to perform the comparison.
+
+Impact
+
+The system successfully answered comparison queries without requiring a specialized comparison tool.
+
+Insight
+
+Some reasoning tools may become unnecessary when the LLM can synthesize answers from more primitive retrieval tools.
 
 Switched to event-based memory.
 
